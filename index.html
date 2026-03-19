@@ -400,10 +400,10 @@
     <div class="panel-body">
 
       <div class="category-grid">
-        <button class="cat-btn active" data-cat="notice" onclick="selectCat(this)">📅 営業日・<br>本日のお知らせ</button>
-        <button class="cat-btn" data-cat="mq" onclick="selectCat(this)">📊 MQ日報・<br>月次レポート</button>
-        <button class="cat-btn" data-cat="product" onclick="selectCat(this)">🛍️ 商品告知<br>（食事券・ふりかけ）</button>
-        <button class="cat-btn" data-cat="campaign" onclick="selectCat(this)">🎬 キャンペーン<br>（プペルなど）</button>
+        <button class="cat-btn active" data-cat="notice">📅 営業日・<br>本日のお知らせ</button>
+        <button class="cat-btn" data-cat="mq">📊 MQ日報・<br>月次レポート</button>
+        <button class="cat-btn" data-cat="product">🛍️ 商品告知<br>（食事券・ふりかけ）</button>
+        <button class="cat-btn" data-cat="campaign">🎬 キャンペーン<br>（プペルなど）</button>
       </div>
 
       <div class="divider">— 詳細を入力 —</div>
@@ -417,7 +417,7 @@
         <textarea id="extraNote" placeholder="例：今日は餃子が特においしかった、雨だけど来てくれた方に感謝、など"></textarea>
       </div>
 
-      <button class="generate-btn" id="generateBtn" onclick="generate()">
+      <button class="generate-btn" id="generateBtn">
         <span class="btn-icon">✨</span>3媒体まとめて生成
       </button>
 
@@ -435,7 +435,7 @@
           <div class="platform-name">Instagram</div>
           <div class="platform-hint">写真映え・ハッシュタグ重視・2200文字以内</div>
         </div>
-        <button class="copy-btn" id="copyIg" onclick="copyText('ig')">コピー</button>
+        <button class="copy-btn" id="copyIg">コピー</button>
       </div>
       <div class="platform-body" id="bodyIg">
         <div class="placeholder">
@@ -453,7 +453,7 @@
           <div class="platform-name">Threads</div>
           <div class="platform-hint">短文・率直・500文字以内</div>
         </div>
-        <button class="copy-btn" id="copyTh" onclick="copyText('th')">コピー</button>
+        <button class="copy-btn" id="copyTh">コピー</button>
       </div>
       <div class="platform-body" id="bodyTh">
         <div class="placeholder">
@@ -471,7 +471,7 @@
           <div class="platform-name">LINE公式</div>
           <div class="platform-hint">友だち向け・親しみやすく・読まれやすい長さ</div>
         </div>
-        <button class="copy-btn" id="copyLn" onclick="copyText('ln')">コピー</button>
+        <button class="copy-btn" id="copyLn">コピー</button>
       </div>
       <div class="platform-body" id="bodyLn">
         <div class="placeholder">
@@ -609,15 +609,10 @@ async function generate() {
   });
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/api/generate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': 'sk-ant-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
-', 'anthropic-version': '2023-06-01', },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
     });
 
     const data = await res.json();
@@ -679,6 +674,17 @@ async function copyText(key) {
     btn.classList.remove('copied');
   }, 2000);
 }
+
+// イベント登録（addEventListener）
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => selectCat(btn));
+});
+
+document.getElementById('generateBtn').addEventListener('click', generate);
+
+document.getElementById('copyIg').addEventListener('click', () => copyText('ig'));
+document.getElementById('copyTh').addEventListener('click', () => copyText('th'));
+document.getElementById('copyLn').addEventListener('click', () => copyText('ln'));
 
 // 初期フィールド描画
 renderFields();
