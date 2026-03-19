@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>想夫恋 SNS投稿ジェネレーター</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500&display=swap');
+
+  :root {
+    --ink: #1a1208;
+    --paper: #faf6ef;
+    --warm: #f5ede0;
+    --accent: #c0392b;
+    --accent2: #e67e22;
+    --muted: #8b7355;
+    --border: #d4c4a8;
+    --instagram: #e1306c;
+    --threads: #000000;
+    --line: #06c755;
+    --card-bg: #ffffff;
+    --shadow: rgba(26,18,8,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ヘッダー */
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 3px solid var(--accent);
+  }
+
+  .logo-mark {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 2px;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .header-badge {
+    margin-left: auto;
+    background: var(--accent);
+    color: white;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+  }
+
+  /* メインレイアウト */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 20px;
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* 左パネル：入力 */
+  .input-panel {
+    background: var(--card-bg);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    position: sticky;
+    top: 88px;
+    box-shadow: 0 4px 24px var(--shadow);
+  }
+
+  .panel-header {
+    background: var(--warm);
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 1px;
+  }
+
+  .panel-body {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  /* カテゴリ選択 */
+  .category-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .cat-btn {
+    padding: 10px 8px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: white;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    line-height: 1.3;
+  }
+
+  .cat-btn:hover { border-color: var(--accent2); color: var(--ink); }
+  .cat-btn.active {
+    border-color: var(--accent);
+    background: #fff5f5;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* 入力フィールド */
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: white;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--accent2);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.6;
+  }
+
+  /* 動的フィールド */
+  .dynamic-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* 生成ボタン */
+  .generate-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 2px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .generate-btn:hover { background: #a93226; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(192,57,43,0.3); }
+  .generate-btn:active { transform: translateY(0); }
+  .generate-btn:disabled { background: var(--border); cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .btn-icon { margin-right: 8px; }
+
+  /* 右パネル：出力 */
+  .output-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* プラットフォームカード */
+  .platform-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: 0 4px 24px var(--shadow);
+    transition: transform 0.2s;
+  }
+
+  .platform-card:hover { transform: translateY(-2px); }
+
+  .platform-header {
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .platform-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .ig-icon { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+  .th-icon { background: #000; }
+  .ln-icon { background: #06c755; }
+
+  .platform-name {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .platform-hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .copy-btn {
+    margin-left: auto;
+    padding: 7px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .copy-btn:hover { border-color: var(--accent2); color: var(--ink); }
+  .copy-btn.copied { border-color: var(--line); color: var(--line); background: #f0fff4; }
+
+  .platform-body {
+    padding: 20px 22px;
+    min-height: 140px;
+    position: relative;
+  }
+
+  .post-text {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--ink);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .char-count {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    margin-top: 10px;
+  }
+
+  /* プレースホルダー */
+  .placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 120px;
+    flex-direction: column;
+    gap: 12px;
+    color: var(--border);
+  }
+
+  .placeholder-icon { font-size: 36px; }
+  .placeholder-text { font-size: 12px; letter-spacing: 1px; }
+
+  /* ローディング */
+  .loading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 0;
+  }
+
+  .spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-size: 13px;
+    color: var(--muted);
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* エラー */
+  .error-msg {
+    padding: 14px 18px;
+    background: #fff5f5;
+    border: 1px solid #fca5a5;
+    border-radius: 10px;
+    font-size: 13px;
+    color: #dc2626;
+  }
+
+  /* 区切り */
+  .divider {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-align: center;
+    margin: 2px 0;
+    text-transform: uppercase;
+  }
+
+  /* レスポンシブ */
+  @media (max-width: 768px) {
+    .container {
+      grid-template-columns: 1fr;
+    }
+    .input-panel { position: relative; top: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo-mark">想夫恋 宇美店</div>
+    <div class="logo-sub">SNS Post Generator</div>
+  </div>
+  <div class="header-badge">Claude AI</div>
+</header>
+
+<div class="container">
+
+  <!-- 左：入力パネル -->
+  <div class="input-panel">
+    <div class="panel-header">
+      <div class="panel-title">📝 投稿カテゴリを選ぶ</div>
+    </div>
+    <div class="panel-body">
+
+      <div class="category-grid">
+        <button class="cat-btn active" data-cat="notice" onclick="selectCat(this)">📅 営業日・<br>本日のお知らせ</button>
+        <button class="cat-btn" data-cat="mq" onclick="selectCat(this)">📊 MQ日報・<br>月次レポート</button>
+        <button class="cat-btn" data-cat="product" onclick="selectCat(this)">🛍️ 商品告知<br>（食事券・ふりかけ）</button>
+        <button class="cat-btn" data-cat="campaign" onclick="selectCat(this)">🎬 キャンペーン<br>（プペルなど）</button>
+      </div>
+
+      <div class="divider">— 詳細を入力 —</div>
+
+      <!-- 動的フィールド -->
+      <div class="dynamic-fields" id="dynamicFields"></div>
+
+      <!-- 自由メモ -->
+      <div>
+        <label>追加で伝えたいこと（任意）</label>
+        <textarea id="extraNote" placeholder="例：今日は餃子が特においしかった、雨だけど来てくれた方に感謝、など"></textarea>
+      </div>
+
+      <button class="generate-btn" id="generateBtn" onclick="generate()">
+        <span class="btn-icon">✨</span>3媒体まとめて生成
+      </button>
+
+    </div>
+  </div>
+
+  <!-- 右：出力パネル -->
+  <div class="output-panel">
+
+    <!-- Instagram -->
+    <div class="platform-card">
+      <div class="platform-header">
+        <div class="platform-icon ig-icon">📸</div>
+        <div>
+          <div class="platform-name">Instagram</div>
+          <div class="platform-hint">写真映え・ハッシュタグ重視・2200文字以内</div>
+        </div>
+        <button class="copy-btn" id="copyIg" onclick="copyText('ig')">コピー</button>
+      </div>
+      <div class="platform-body" id="bodyIg">
+        <div class="placeholder">
+          <div class="placeholder-icon">📷</div>
+          <div class="placeholder-text">生成ボタンを押してください</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Threads -->
+    <div class="platform-card">
+      <div class="platform-header">
+        <div class="platform-icon th-icon">🧵</div>
+        <div>
+          <div class="platform-name">Threads</div>
+          <div class="platform-hint">短文・率直・500文字以内</div>
+        </div>
+        <button class="copy-btn" id="copyTh" onclick="copyText('th')">コピー</button>
+      </div>
+      <div class="platform-body" id="bodyTh">
+        <div class="placeholder">
+          <div class="placeholder-icon">🧵</div>
+          <div class="placeholder-text">生成ボタンを押してください</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LINE -->
+    <div class="platform-card">
+      <div class="platform-header">
+        <div class="platform-icon ln-icon">💬</div>
+        <div>
+          <div class="platform-name">LINE公式</div>
+          <div class="platform-hint">友だち向け・親しみやすく・読まれやすい長さ</div>
+        </div>
+        <button class="copy-btn" id="copyLn" onclick="copyText('ln')">コピー</button>
+      </div>
+      <div class="platform-body" id="bodyLn">
+        <div class="placeholder">
+          <div class="placeholder-icon">💬</div>
+          <div class="placeholder-text">生成ボタンを押してください</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let currentCat = 'notice';
+let generatedTexts = { ig: '', th: '', ln: '' };
+
+const catFields = {
+  notice: [
+    { id: 'todayDate', label: '日付', type: 'input', placeholder: '例：3月19日（木）' },
+    { id: 'isOpen', label: '営業状況', type: 'select', options: ['通常営業', '本日お休み', '時間変更あり', 'ランチのみ', 'ディナーのみ'] },
+    { id: 'todayMsg', label: '今日のひとこと', type: 'textarea', placeholder: '例：春の陽気でした。今日は焼きそばが一段と美味しく感じました。' },
+  ],
+  mq: [
+    { id: 'period', label: '対象期間', type: 'input', placeholder: '例：2月 / 2月第2週' },
+    { id: 'sales', label: '売上（PQ）', type: 'input', placeholder: '例：1,980,000円' },
+    { id: 'mq', label: 'MQ（粗利）', type: 'input', placeholder: '例：1,188,000円' },
+    { id: 'mqRate', label: 'M率', type: 'input', placeholder: '例：60%' },
+    { id: 'comment', label: '所感・ひとこと', type: 'textarea', placeholder: '例：F0回収16日。前月より改善。食事券の初回成約あり。' },
+  ],
+  product: [
+    { id: 'productName', label: '商品名', type: 'select', options: ['ありがとう循環食事券（11枚 11,000円）', 'ありがとう循環食事券（33枚 33,000円）', '焼きそば専用ふりかけ（80g ¥800）', 'その他'] },
+    { id: 'productPoint', label: 'アピールポイント', type: 'textarea', placeholder: '例：感謝が自然に生まれる仕組みです。福利厚生として使えます。' },
+    { id: 'cta', label: 'CTA（行動喚起）', type: 'input', placeholder: '例：LINEからご注文、店頭でもどうぞ' },
+  ],
+  campaign: [
+    { id: 'campName', label: 'キャンペーン名', type: 'input', placeholder: '例：#プペルと想夫恋' },
+    { id: 'campDetail', label: '内容', type: 'textarea', placeholder: '例：焼きそばの写真をLINEに送ると毎週5組にムビチケが当たる！' },
+    { id: 'campPeriod', label: '期間', type: 'input', placeholder: '例：3月25日〜4月30日' },
+    { id: 'campCta', label: 'CTA', type: 'input', placeholder: '例：LINEに「プペル」と送ってエントリー' },
+  ],
+};
+
+function selectCat(btn) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentCat = btn.dataset.cat;
+  renderFields();
+}
+
+function renderFields() {
+  const fields = catFields[currentCat];
+  const container = document.getElementById('dynamicFields');
+  container.innerHTML = '';
+
+  fields.forEach(f => {
+    const wrap = document.createElement('div');
+
+    if (f.type === 'select') {
+      wrap.innerHTML = `
+        <label>${f.label}</label>
+        <select id="${f.id}">
+          ${f.options.map(o => `<option value="${o}">${o}</option>`).join('')}
+        </select>`;
+    } else if (f.type === 'textarea') {
+      wrap.innerHTML = `
+        <label>${f.label}</label>
+        <textarea id="${f.id}" placeholder="${f.placeholder || ''}"></textarea>`;
+    } else {
+      wrap.innerHTML = `
+        <label>${f.label}</label>
+        <input type="text" id="${f.id}" placeholder="${f.placeholder || ''}">`;
+    }
+
+    container.appendChild(wrap);
+  });
+}
+
+function collectInputs() {
+  const fields = catFields[currentCat];
+  const data = {};
+  fields.forEach(f => {
+    const el = document.getElementById(f.id);
+    if (el) data[f.label] = el.value;
+  });
+  const extra = document.getElementById('extraNote').value;
+  if (extra) data['追加メモ'] = extra;
+  return data;
+}
+
+function buildPrompt(cat, inputs) {
+  const inputStr = Object.entries(inputs).map(([k,v]) => v ? `・${k}：${v}` : '').filter(Boolean).join('\n');
+
+  const catDesc = {
+    notice: '営業日・本日のお知らせ',
+    mq: 'MQ会計を使った日報・月次レポート（数字を使いながら経営者の生の声を伝える）',
+    product: '食事券またはふりかけの商品告知',
+    campaign: 'キャンペーン告知',
+  }[cat];
+
+  return `あなたは福岡県宇美町にある焼きそば専門店「想夫恋 宇美店」の二代目オーナー「後藤堅太郎」です。
+「感謝」を経営の軸に置き、MQ会計で数字を管理しながら、店の外への事業展開（食事券・ふりかけ）も手がけています。
+文体は誠実で親しみやすく、飾らないが温かい。押しつけがましくない。
+
+以下の情報をもとに、3つのSNS媒体用の投稿文を生成してください。
+
+カテゴリ：${catDesc}
+
+入力情報：
+${inputStr || '（特になし）'}
+
+---
+
+以下のJSON形式のみで返してください（コードブロック不要）：
+{
+  "instagram": "Instagramの投稿文。絵文字を適度に使用。ハッシュタグ5〜8個を文末に。写真映えを意識した読みやすい改行。2200文字以内。",
+  "threads": "Threadsの投稿文。率直で短く、本音感のある文体。ハッシュタグなし。300〜500文字以内。",
+  "line": "LINE公式の投稿文。友だちに話しかける感覚。親しみやすく読みやすい改行。クーポン・来店促進を自然に含める。300〜500文字程度。"
+}`;
+}
+
+async function generate() {
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="btn-icon">⏳</span>生成中...';
+
+  const inputs = collectInputs();
+  const prompt = buildPrompt(currentCat, inputs);
+
+  ['Ig','Th','Ln'].forEach(id => {
+    document.getElementById('body'+id).innerHTML = `
+      <div class="loading">
+        <div class="spinner"></div>
+        <div class="loading-text">Claudeが考えています...</div>
+      </div>`;
+  });
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    const raw = data.content?.map(c => c.text || '').join('');
+
+    let parsed;
+    try {
+      const cleaned = raw.replace(/```json|```/g, '').trim();
+      parsed = JSON.parse(cleaned);
+    } catch(e) {
+      throw new Error('JSONの解析に失敗しました。もう一度お試しください。');
+    }
+
+    generatedTexts.ig = parsed.instagram || '';
+    generatedTexts.th = parsed.threads || '';
+    generatedTexts.ln = parsed.line || '';
+
+    renderOutput('Ig', generatedTexts.ig);
+    renderOutput('Th', generatedTexts.th);
+    renderOutput('Ln', generatedTexts.ln);
+
+  } catch(err) {
+    ['Ig','Th','Ln'].forEach(id => {
+      document.getElementById('body'+id).innerHTML =
+        `<div class="error-msg">⚠️ ${err.message || 'エラーが発生しました'}</div>`;
+    });
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span class="btn-icon">✨</span>3媒体まとめて生成';
+}
+
+function renderOutput(id, text) {
+  const el = document.getElementById('body'+id);
+  if (!text) {
+    el.innerHTML = '<div class="placeholder"><div class="placeholder-text">生成できませんでした</div></div>';
+    return;
+  }
+  el.innerHTML = `
+    <div class="post-text">${escapeHtml(text)}</div>
+    <div class="char-count">${text.length}文字</div>`;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+async function copyText(key) {
+  const text = generatedTexts[key];
+  if (!text) return;
+  await navigator.clipboard.writeText(text);
+
+  const btnId = 'copy' + key.charAt(0).toUpperCase() + key.slice(1);
+  const btn = document.getElementById(btnId);
+  btn.textContent = '✓ コピーしました';
+  btn.classList.add('copied');
+  setTimeout(() => {
+    btn.textContent = 'コピー';
+    btn.classList.remove('copied');
+  }, 2000);
+}
+
+// 初期フィールド描画
+renderFields();
+</script>
+</body>
+</html>
