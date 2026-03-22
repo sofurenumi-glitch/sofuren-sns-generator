@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>想夫恋 SNS投稿ジェネレーター</title>
+<title>SNS投稿ジェネレーター</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500&display=swap');
 
@@ -15,8 +15,6 @@
     --accent2: #e67e22;
     --muted: #8b7355;
     --border: #d4c4a8;
-    --instagram: #e1306c;
-    --threads: #000000;
     --line: #06c755;
     --card-bg: #ffffff;
     --shadow: rgba(26,18,8,0.08);
@@ -31,14 +29,13 @@
     min-height: 100vh;
   }
 
-  /* ヘッダー */
   header {
     background: var(--ink);
     color: var(--paper);
-    padding: 20px 32px;
+    padding: 16px 24px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -47,22 +44,42 @@
 
   .logo-mark {
     font-family: 'Noto Serif JP', serif;
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 700;
     color: var(--accent2);
-    letter-spacing: 2px;
+    letter-spacing: 1px;
   }
 
   .logo-sub {
-    font-size: 11px;
+    font-size: 10px;
     color: var(--muted);
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     text-transform: uppercase;
     margin-top: 2px;
   }
 
-  .header-badge {
+  .header-actions {
     margin-left: auto;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .settings-btn {
+    background: transparent;
+    border: 1px solid var(--muted);
+    color: var(--paper);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+  .settings-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .header-badge {
     background: var(--accent);
     color: white;
     font-size: 10px;
@@ -72,71 +89,215 @@
     letter-spacing: 1px;
   }
 
+  /* モーダル */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--card-bg);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .modal-header {
+    padding: 22px 26px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .modal-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 4px 8px;
+    line-height: 1;
+  }
+
+  .modal-body {
+    padding: 24px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .modal-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* カテゴリ編集 */
+  .category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .category-item {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .category-item input {
+    flex: 1;
+  }
+
+  .del-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .del-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .add-cat-btn {
+    padding: 8px 14px;
+    border: 1.5px dashed var(--border);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    width: 100%;
+    margin-top: 4px;
+  }
+  .add-cat-btn:hover { border-color: var(--accent2); color: var(--ink); }
+
+  /* URL共有 */
+  .url-box {
+    background: var(--warm);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .url-text {
+    font-size: 11px;
+    color: var(--ink);
+    word-break: break-all;
+    flex: 1;
+    line-height: 1.5;
+  }
+
+  .url-copy-btn {
+    padding: 8px 14px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .url-copy-btn:hover { background: #a93226; }
+
   /* メインレイアウト */
   .container {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 32px 20px;
+    padding: 28px 20px;
     display: grid;
-    grid-template-columns: 340px 1fr;
-    gap: 28px;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
     align-items: start;
   }
 
-  /* 左パネル：入力 */
   .input-panel {
     background: var(--card-bg);
     border-radius: 16px;
     border: 1px solid var(--border);
     overflow: hidden;
     position: sticky;
-    top: 88px;
+    top: 76px;
     box-shadow: 0 4px 24px var(--shadow);
   }
 
   .panel-header {
     background: var(--warm);
-    padding: 18px 22px;
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border);
   }
 
   .panel-title {
     font-family: 'Noto Serif JP', serif;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--ink);
     letter-spacing: 1px;
   }
 
   .panel-body {
-    padding: 22px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 16px;
   }
 
-  /* カテゴリ選択 */
   .category-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: 7px;
   }
 
   .cat-btn {
-    padding: 10px 8px;
+    padding: 9px 6px;
     border: 1.5px solid var(--border);
     border-radius: 10px;
     background: white;
     font-family: 'Noto Sans JP', sans-serif;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     color: var(--muted);
     cursor: pointer;
     text-align: center;
     transition: all 0.2s;
-    line-height: 1.3;
+    line-height: 1.4;
+    word-break: break-all;
   }
-
   .cat-btn:hover { border-color: var(--accent2); color: var(--ink); }
   .cat-btn.active {
     border-color: var(--accent);
@@ -145,20 +306,19 @@
     font-weight: 700;
   }
 
-  /* 入力フィールド */
   label {
     display: block;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 500;
     color: var(--muted);
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    margin-bottom: 7px;
+    margin-bottom: 6px;
   }
 
-  input, textarea, select {
+  input[type="text"], textarea, select {
     width: 100%;
-    padding: 10px 14px;
+    padding: 9px 12px;
     border: 1.5px solid var(--border);
     border-radius: 10px;
     background: white;
@@ -168,62 +328,44 @@
     outline: none;
     transition: border-color 0.2s;
   }
-
-  input:focus, textarea:focus, select:focus {
-    border-color: var(--accent2);
-  }
+  input[type="text"]:focus, textarea:focus, select:focus { border-color: var(--accent2); }
 
   textarea {
     resize: vertical;
-    min-height: 80px;
+    min-height: 72px;
     line-height: 1.6;
   }
 
-  /* 動的フィールド */
-  .dynamic-fields {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+  .dynamic-fields { display: flex; flex-direction: column; gap: 13px; }
+
+  .divider {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-align: center;
+    text-transform: uppercase;
   }
 
-  .field-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  /* 生成ボタン */
   .generate-btn {
     width: 100%;
-    padding: 14px;
+    padding: 13px;
     background: var(--accent);
     color: white;
     border: none;
     border-radius: 12px;
     font-family: 'Noto Serif JP', serif;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     cursor: pointer;
     letter-spacing: 2px;
     transition: all 0.2s;
-    position: relative;
-    overflow: hidden;
   }
-
   .generate-btn:hover { background: #a93226; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(192,57,43,0.3); }
   .generate-btn:active { transform: translateY(0); }
   .generate-btn:disabled { background: var(--border); cursor: not-allowed; transform: none; box-shadow: none; }
 
-  .btn-icon { margin-right: 8px; }
+  .output-panel { display: flex; flex-direction: column; gap: 18px; }
 
-  /* 右パネル：出力 */
-  .output-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  /* プラットフォームカード */
   .platform-card {
     background: var(--card-bg);
     border-radius: 16px;
@@ -232,202 +374,265 @@
     box-shadow: 0 4px 24px var(--shadow);
     transition: transform 0.2s;
   }
-
   .platform-card:hover { transform: translateY(-2px); }
 
   .platform-header {
-    padding: 14px 22px;
+    padding: 13px 20px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 11px;
     border-bottom: 1px solid var(--border);
   }
 
   .platform-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    width: 34px; height: 34px;
+    border-radius: 9px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 17px;
     flex-shrink: 0;
   }
-
   .ig-icon { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
   .th-icon { background: #000; }
   .ln-icon { background: #06c755; }
 
   .platform-name {
     font-family: 'Noto Serif JP', serif;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
-    color: var(--ink);
   }
-
-  .platform-hint {
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 2px;
-  }
+  .platform-hint { font-size: 10px; color: var(--muted); margin-top: 2px; }
 
   .copy-btn {
     margin-left: auto;
-    padding: 7px 16px;
+    padding: 6px 14px;
     border: 1.5px solid var(--border);
     border-radius: 8px;
     background: white;
     font-family: 'Noto Sans JP', sans-serif;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     color: var(--muted);
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
   }
-
   .copy-btn:hover { border-color: var(--accent2); color: var(--ink); }
   .copy-btn.copied { border-color: var(--line); color: var(--line); background: #f0fff4; }
 
-  .platform-body {
-    padding: 20px 22px;
-    min-height: 140px;
-    position: relative;
-  }
+  .platform-body { padding: 18px 20px; min-height: 120px; }
 
   .post-text {
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.8;
     color: var(--ink);
     white-space: pre-wrap;
     word-break: break-word;
   }
+  .char-count { font-size: 10px; color: var(--muted); text-align: right; margin-top: 8px; }
 
-  .char-count {
-    font-size: 11px;
-    color: var(--muted);
-    text-align: right;
-    margin-top: 10px;
-  }
-
-  /* プレースホルダー */
   .placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 120px;
-    flex-direction: column;
-    gap: 12px;
-    color: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    height: 100px; flex-direction: column; gap: 10px; color: var(--border);
   }
+  .placeholder-icon { font-size: 32px; }
+  .placeholder-text { font-size: 11px; letter-spacing: 1px; }
 
-  .placeholder-icon { font-size: 36px; }
-  .placeholder-text { font-size: 12px; letter-spacing: 1px; }
-
-  /* ローディング */
-  .loading {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 20px 0;
-  }
-
+  .loading { display: flex; align-items: center; gap: 12px; padding: 16px 0; }
   .spinner {
-    width: 24px;
-    height: 24px;
+    width: 22px; height: 22px;
     border: 3px solid var(--border);
     border-top-color: var(--accent);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
-
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  .loading-text {
-    font-size: 13px;
-    color: var(--muted);
-    animation: pulse 1.2s ease-in-out infinite;
-  }
-
+  .loading-text { font-size: 12px; color: var(--muted); animation: pulse 1.2s ease-in-out infinite; }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-  /* エラー */
   .error-msg {
-    padding: 14px 18px;
+    padding: 12px 16px;
     background: #fff5f5;
     border: 1px solid #fca5a5;
     border-radius: 10px;
-    font-size: 13px;
+    font-size: 12px;
     color: #dc2626;
   }
 
-  /* 区切り */
-  .divider {
-    font-size: 11px;
-    color: var(--muted);
+  .save-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--ink);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
     letter-spacing: 2px;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+  .save-btn:hover { background: #333; }
+
+  .success-msg {
+    padding: 10px 14px;
+    background: #f0fff4;
+    border: 1px solid #86efac;
+    border-radius: 10px;
+    font-size: 12px;
+    color: #16a34a;
     text-align: center;
-    margin: 2px 0;
-    text-transform: uppercase;
+    display: none;
   }
 
-  /* レスポンシブ */
   @media (max-width: 768px) {
-    .container {
-      grid-template-columns: 1fr;
-    }
+    .container { grid-template-columns: 1fr; }
     .input-panel { position: relative; top: 0; }
   }
 </style>
 </head>
 <body>
 
+<!-- パスワード画面 -->
+<div id="authScreen" style="
+  display:none;
+  position:fixed;inset:0;
+  background:var(--ink);
+  z-index:999;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:24px;
+">
+  <div style="text-align:center;">
+    <div style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent2);letter-spacing:2px;">SNS投稿ジェネレーター</div>
+    <div style="font-size:11px;color:var(--muted);letter-spacing:3px;margin-top:6px;">POWERED BY CLAUDE AI</div>
+  </div>
+  <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:28px 32px;width:100%;max-width:340px;">
+    <div style="font-size:12px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">パスワードを入力</div>
+    <input type="password" id="authInput" placeholder="••••••••"
+      style="width:100%;padding:12px 16px;border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;background:rgba(255,255,255,0.08);color:white;font-size:16px;font-family:'Noto Sans JP',sans-serif;outline:none;letter-spacing:4px;">
+    <div id="authError" style="font-size:12px;color:#f87171;margin-top:10px;display:none;">パスワードが違います</div>
+    <button id="authBtn" style="
+      width:100%;margin-top:16px;padding:13px;
+      background:var(--accent);color:white;border:none;border-radius:12px;
+      font-family:'Noto Serif JP',serif;font-size:14px;font-weight:700;
+      cursor:pointer;letter-spacing:2px;transition:all 0.2s;
+    ">入力する</button>
+  </div>
+</div>
+
 <header>
   <div>
-    <div class="logo-mark">想夫恋 宇美店</div>
-    <div class="logo-sub">SNS Post Generator</div>
+    <div class="logo-mark" id="headerTitle">SNS投稿ジェネレーター</div>
+    <div class="logo-sub">Powered by Claude AI</div>
   </div>
-  <div class="header-badge">Claude AI</div>
+  <div class="header-actions">
+    <button class="settings-btn" id="openSettings">⚙️ 店舗設定</button>
+    <div class="header-badge">Claude AI</div>
+  </div>
 </header>
 
-<div class="container">
+<!-- 設定モーダル -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">⚙️ 店舗設定</div>
+      <button class="modal-close" id="closeModal">✕</button>
+    </div>
+    <div class="modal-body">
 
-  <!-- 左：入力パネル -->
+      <!-- 基本情報 -->
+      <div>
+        <div class="modal-section-title">基本情報</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <label>店名・屋号</label>
+            <input type="text" id="cfg_name" placeholder="例：想夫恋 宇美店">
+          </div>
+          <div>
+            <label>業種・業態</label>
+            <input type="text" id="cfg_industry" placeholder="例：焼きそば専門店、美容室、カフェ">
+          </div>
+          <div>
+            <label>一言自己紹介（プロンプトに反映）</label>
+            <textarea id="cfg_profile" placeholder="例：福岡県宇美町の焼きそば専門店。感謝を大切にしながら、食事券やふりかけなど店外事業にも取り組んでいます。"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 文体設定 -->
+      <div>
+        <div class="modal-section-title">文体・口調</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <label>基本トーン</label>
+            <select id="cfg_tone">
+              <option value="親しみやすく温かい">親しみやすく温かい</option>
+              <option value="丁寧でプロフェッショナル">丁寧でプロフェッショナル</option>
+              <option value="カジュアルで明るい">カジュアルで明るい</option>
+              <option value="クールで洗練された">クールで洗練された</option>
+              <option value="関西弁・方言でフレンドリー">関西弁・方言でフレンドリー</option>
+              <option value="経営者視点・数字重視">経営者視点・数字重視</option>
+            </select>
+          </div>
+          <div>
+            <label>補足（口調の特徴など）</label>
+            <input type="text" id="cfg_tone_note" placeholder="例：押しつけがましくない、飾らない、誠実">
+          </div>
+        </div>
+      </div>
+
+      <!-- 投稿カテゴリ編集 -->
+      <div>
+        <div class="modal-section-title">投稿カテゴリ（最大6つ）</div>
+        <div class="category-list" id="categoryList"></div>
+        <button class="add-cat-btn" id="addCatBtn">＋ カテゴリを追加</button>
+      </div>
+
+      <!-- URL共有 -->
+      <div>
+        <div class="modal-section-title">設定を保存・共有</div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6;">
+          「URLを生成」を押すと設定が埋め込まれたURLが作られます。ブックマークするか、クライアントに共有してください。
+        </p>
+        <div class="url-box" id="urlBox" style="display:none;">
+          <div class="url-text" id="urlText"></div>
+          <button class="url-copy-btn" id="urlCopyBtn">コピー</button>
+        </div>
+        <div class="success-msg" id="successMsg">✓ URLをコピーしました</div>
+      </div>
+
+      <button class="save-btn" id="saveSettings">設定を保存してURLを生成</button>
+
+    </div>
+  </div>
+</div>
+
+<!-- メイン -->
+<div class="container">
   <div class="input-panel">
     <div class="panel-header">
       <div class="panel-title">📝 投稿カテゴリを選ぶ</div>
     </div>
     <div class="panel-body">
-
-      <div class="category-grid">
-        <button class="cat-btn active" data-cat="notice">📅 営業日・<br>本日のお知らせ</button>
-        <button class="cat-btn" data-cat="mq">📊 MQ日報・<br>月次レポート</button>
-        <button class="cat-btn" data-cat="product">🛍️ 商品告知<br>（食事券・ふりかけ）</button>
-        <button class="cat-btn" data-cat="campaign">🎬 キャンペーン<br>（プペルなど）</button>
-      </div>
-
+      <div class="category-grid" id="catGrid"></div>
       <div class="divider">— 詳細を入力 —</div>
-
-      <!-- 動的フィールド -->
       <div class="dynamic-fields" id="dynamicFields"></div>
-
-      <!-- 自由メモ -->
       <div>
         <label>追加で伝えたいこと（任意）</label>
-        <textarea id="extraNote" placeholder="例：今日は餃子が特においしかった、雨だけど来てくれた方に感謝、など"></textarea>
+        <textarea id="extraNote" placeholder="例：今日は特別なことがありました、など"></textarea>
       </div>
-
       <button class="generate-btn" id="generateBtn">
-        <span class="btn-icon">✨</span>3媒体まとめて生成
+        <span>✨</span> 3媒体まとめて生成
       </button>
-
     </div>
   </div>
 
-  <!-- 右：出力パネル -->
   <div class="output-panel">
-
-    <!-- Instagram -->
     <div class="platform-card">
       <div class="platform-header">
         <div class="platform-icon ig-icon">📸</div>
@@ -438,14 +643,10 @@
         <button class="copy-btn" id="copyIg">コピー</button>
       </div>
       <div class="platform-body" id="bodyIg">
-        <div class="placeholder">
-          <div class="placeholder-icon">📷</div>
-          <div class="placeholder-text">生成ボタンを押してください</div>
-        </div>
+        <div class="placeholder"><div class="placeholder-icon">📷</div><div class="placeholder-text">生成ボタンを押してください</div></div>
       </div>
     </div>
 
-    <!-- Threads -->
     <div class="platform-card">
       <div class="platform-header">
         <div class="platform-icon th-icon">🧵</div>
@@ -456,14 +657,10 @@
         <button class="copy-btn" id="copyTh">コピー</button>
       </div>
       <div class="platform-body" id="bodyTh">
-        <div class="placeholder">
-          <div class="placeholder-icon">🧵</div>
-          <div class="placeholder-text">生成ボタンを押してください</div>
-        </div>
+        <div class="placeholder"><div class="placeholder-icon">🧵</div><div class="placeholder-text">生成ボタンを押してください</div></div>
       </div>
     </div>
 
-    <!-- LINE -->
     <div class="platform-card">
       <div class="platform-header">
         <div class="platform-icon ln-icon">💬</div>
@@ -474,131 +671,206 @@
         <button class="copy-btn" id="copyLn">コピー</button>
       </div>
       <div class="platform-body" id="bodyLn">
-        <div class="placeholder">
-          <div class="placeholder-icon">💬</div>
-          <div class="placeholder-text">生成ボタンを押してください</div>
-        </div>
+        <div class="placeholder"><div class="placeholder-icon">💬</div><div class="placeholder-text">生成ボタンを押してください</div></div>
       </div>
     </div>
-
   </div>
 </div>
 
 <script>
-let currentCat = 'notice';
-let generatedTexts = { ig: '', th: '', ln: '' };
+// ==================== 設定管理 ====================
 
-const catFields = {
-  notice: [
-    { id: 'todayDate', label: '日付', type: 'input', placeholder: '例：3月19日（木）' },
-    { id: 'isOpen', label: '営業状況', type: 'select', options: ['通常営業', '本日お休み', '時間変更あり', 'ランチのみ', 'ディナーのみ'] },
-    { id: 'todayMsg', label: '今日のひとこと', type: 'textarea', placeholder: '例：春の陽気でした。今日は焼きそばが一段と美味しく感じました。' },
-  ],
-  mq: [
-    { id: 'period', label: '対象期間', type: 'input', placeholder: '例：2月 / 2月第2週' },
-    { id: 'sales', label: '売上（PQ）', type: 'input', placeholder: '例：1,980,000円' },
-    { id: 'mq', label: 'MQ（粗利）', type: 'input', placeholder: '例：1,188,000円' },
-    { id: 'mqRate', label: 'M率', type: 'input', placeholder: '例：60%' },
-    { id: 'comment', label: '所感・ひとこと', type: 'textarea', placeholder: '例：F0回収16日。前月より改善。食事券の初回成約あり。' },
-  ],
-  product: [
-    { id: 'productName', label: '商品名', type: 'select', options: ['ありがとう循環食事券（11枚 11,000円）', 'ありがとう循環食事券（33枚 33,000円）', '焼きそば専用ふりかけ（80g ¥800）', 'その他'] },
-    { id: 'productPoint', label: 'アピールポイント', type: 'textarea', placeholder: '例：感謝が自然に生まれる仕組みです。福利厚生として使えます。' },
-    { id: 'cta', label: 'CTA（行動喚起）', type: 'input', placeholder: '例：LINEからご注文、店頭でもどうぞ' },
-  ],
-  campaign: [
-    { id: 'campName', label: 'キャンペーン名', type: 'input', placeholder: '例：#プペルと想夫恋' },
-    { id: 'campDetail', label: '内容', type: 'textarea', placeholder: '例：焼きそばの写真をLINEに送ると毎週5組にムビチケが当たる！' },
-    { id: 'campPeriod', label: '期間', type: 'input', placeholder: '例：3月25日〜4月30日' },
-    { id: 'campCta', label: 'CTA', type: 'input', placeholder: '例：LINEに「プペル」と送ってエントリー' },
+const DEFAULT_CONFIG = {
+  name: '',
+  industry: '',
+  profile: '',
+  tone: '親しみやすく温かい',
+  toneNote: '',
+  categories: [
+    '営業日・本日のお知らせ',
+    'MQ日報・月次レポート',
+    '商品・サービス告知',
+    'キャンペーン告知',
   ],
 };
 
-function selectCat(btn) {
-  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  currentCat = btn.dataset.cat;
-  renderFields();
+let config = { ...DEFAULT_CONFIG };
+let currentCat = 0;
+let generatedTexts = { ig: '', th: '', ln: '' };
+
+// URLパラメータから設定を読み込む
+function loadFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('name')) config.name = params.get('name');
+  if (params.get('industry')) config.industry = params.get('industry');
+  if (params.get('profile')) config.profile = decodeURIComponent(params.get('profile'));
+  if (params.get('tone')) config.tone = decodeURIComponent(params.get('tone'));
+  if (params.get('toneNote')) config.toneNote = decodeURIComponent(params.get('toneNote'));
+  if (params.get('cats')) {
+    try {
+      config.categories = JSON.parse(decodeURIComponent(params.get('cats')));
+    } catch(e) {}
+  }
+}
+
+// 設定からURLを生成
+function buildURL() {
+  const params = new URLSearchParams();
+  if (config.name) params.set('name', config.name);
+  if (config.industry) params.set('industry', config.industry);
+  if (config.profile) params.set('profile', encodeURIComponent(config.profile));
+  if (config.tone) params.set('tone', encodeURIComponent(config.tone));
+  if (config.toneNote) params.set('toneNote', encodeURIComponent(config.toneNote));
+  params.set('cats', encodeURIComponent(JSON.stringify(config.categories)));
+  return `${location.origin}${location.pathname}?${params.toString()}`;
+}
+
+// ==================== UI描画 ====================
+
+function renderHeader() {
+  document.getElementById('headerTitle').textContent = config.name || 'SNS投稿ジェネレーター';
+  document.title = config.name ? `${config.name} SNSジェネレーター` : 'SNS投稿ジェネレーター';
+}
+
+function renderCatGrid() {
+  const grid = document.getElementById('catGrid');
+  grid.innerHTML = '';
+  config.categories.forEach((cat, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn' + (i === currentCat ? ' active' : '');
+    btn.textContent = cat;
+    btn.addEventListener('click', () => {
+      currentCat = i;
+      renderCatGrid();
+      renderFields();
+    });
+    grid.appendChild(btn);
+  });
 }
 
 function renderFields() {
-  const fields = catFields[currentCat];
   const container = document.getElementById('dynamicFields');
-  container.innerHTML = '';
+  container.innerHTML = `
+    <div>
+      <label>今回の内容・トピック</label>
+      <textarea id="mainContent" placeholder="例：本日の営業状況、売上数字、告知内容など自由に入力してください"></textarea>
+    </div>`;
+}
 
-  fields.forEach(f => {
-    const wrap = document.createElement('div');
+// ==================== モーダル ====================
 
-    if (f.type === 'select') {
-      wrap.innerHTML = `
-        <label>${f.label}</label>
-        <select id="${f.id}">
-          ${f.options.map(o => `<option value="${o}">${o}</option>`).join('')}
-        </select>`;
-    } else if (f.type === 'textarea') {
-      wrap.innerHTML = `
-        <label>${f.label}</label>
-        <textarea id="${f.id}" placeholder="${f.placeholder || ''}"></textarea>`;
-    } else {
-      wrap.innerHTML = `
-        <label>${f.label}</label>
-        <input type="text" id="${f.id}" placeholder="${f.placeholder || ''}">`;
-    }
+function openModal() {
+  // フォームに現在の設定を反映
+  document.getElementById('cfg_name').value = config.name;
+  document.getElementById('cfg_industry').value = config.industry;
+  document.getElementById('cfg_profile').value = config.profile;
+  document.getElementById('cfg_tone').value = config.tone;
+  document.getElementById('cfg_tone_note').value = config.toneNote;
+  renderCategoryList();
+  document.getElementById('urlBox').style.display = 'none';
+  document.getElementById('successMsg').style.display = 'none';
+  document.getElementById('modalOverlay').classList.add('open');
+}
 
-    container.appendChild(wrap);
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function renderCategoryList() {
+  const list = document.getElementById('categoryList');
+  list.innerHTML = '';
+  config.categories.forEach((cat, i) => {
+    const item = document.createElement('div');
+    item.className = 'category-item';
+    item.innerHTML = `
+      <input type="text" value="${escapeHtml(cat)}" data-index="${i}" class="cat-input">
+      <button class="del-btn" data-index="${i}">✕</button>`;
+    list.appendChild(item);
+  });
+
+  list.querySelectorAll('.cat-input').forEach(inp => {
+    inp.addEventListener('input', e => {
+      config.categories[parseInt(e.target.dataset.index)] = e.target.value;
+    });
+  });
+
+  list.querySelectorAll('.del-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const idx = parseInt(e.target.dataset.index);
+      config.categories.splice(idx, 1);
+      if (currentCat >= config.categories.length) currentCat = 0;
+      renderCategoryList();
+    });
   });
 }
 
-function collectInputs() {
-  const fields = catFields[currentCat];
-  const data = {};
-  fields.forEach(f => {
-    const el = document.getElementById(f.id);
-    if (el) data[f.label] = el.value;
+function saveSettings() {
+  config.name = document.getElementById('cfg_name').value.trim();
+  config.industry = document.getElementById('cfg_industry').value.trim();
+  config.profile = document.getElementById('cfg_profile').value.trim();
+  config.tone = document.getElementById('cfg_tone').value;
+  config.toneNote = document.getElementById('cfg_tone_note').value.trim();
+
+  // カテゴリ最新値を取得
+  document.querySelectorAll('.cat-input').forEach(inp => {
+    config.categories[parseInt(inp.dataset.index)] = inp.value;
   });
-  const extra = document.getElementById('extraNote').value;
-  if (extra) data['追加メモ'] = extra;
-  return data;
+  config.categories = config.categories.filter(c => c.trim() !== '');
+
+  // URLを生成・表示
+  const url = buildURL();
+  document.getElementById('urlText').textContent = url;
+  document.getElementById('urlBox').style.display = 'flex';
+
+  // URLをブラウザに反映（リロードなし）
+  history.replaceState(null, '', url);
+
+  renderHeader();
+  renderCatGrid();
+  renderFields();
 }
 
-function buildPrompt(cat, inputs) {
-  const inputStr = Object.entries(inputs).map(([k,v]) => v ? `・${k}：${v}` : '').filter(Boolean).join('\n');
+// ==================== プロンプト生成 ====================
 
-  const catDesc = {
-    notice: '営業日・本日のお知らせ',
-    mq: 'MQ会計を使った日報・月次レポート（数字を使いながら経営者の生の声を伝える）',
-    product: '食事券またはふりかけの商品告知',
-    campaign: 'キャンペーン告知',
-  }[cat];
+function buildPrompt(inputs) {
+  const shopName = config.name || '店舗名未設定';
+  const industry = config.industry || '店舗';
+  const profile = config.profile || '';
+  const tone = config.tone;
+  const toneNote = config.toneNote ? `・${config.toneNote}` : '';
+  const catName = config.categories[currentCat] || '投稿';
 
-  return `あなたは福岡県宇美町にある焼きそば専門店「想夫恋 宇美店」の二代目オーナー「後藤堅太郎」です。
-「感謝」を経営の軸に置き、MQ会計で数字を管理しながら、店の外への事業展開（食事券・ふりかけ）も手がけています。
-文体は誠実で親しみやすく、飾らないが温かい。押しつけがましくない。
+  return `あなたは「${shopName}」のSNS担当者です。
+業種：${industry}
+${profile ? `店舗紹介：${profile}` : ''}
+文体・口調：${tone}${toneNote}
 
-以下の情報をもとに、3つのSNS媒体用の投稿文を生成してください。
+以下の情報をもとに、カテゴリ「${catName}」の投稿文を3つのSNS媒体向けに生成してください。
 
-カテゴリ：${catDesc}
-
-入力情報：
-${inputStr || '（特になし）'}
+入力内容：
+${inputs || '（特になし）'}
 
 ---
 
 以下のJSON形式のみで返してください（コードブロック不要）：
 {
-  "instagram": "Instagramの投稿文。絵文字を適度に使用。ハッシュタグ5〜8個を文末に。写真映えを意識した読みやすい改行。2200文字以内。",
-  "threads": "Threadsの投稿文。率直で短く、本音感のある文体。ハッシュタグなし。300〜500文字以内。",
-  "line": "LINE公式の投稿文。友だちに話しかける感覚。親しみやすく読みやすい改行。クーポン・来店促進を自然に含める。300〜500文字程度。"
+  "instagram": "Instagramの投稿文。絵文字を適度に使用。ハッシュタグ5〜8個を文末に。読みやすい改行。2200文字以内。",
+  "threads": "Threadsの投稿文。率直で短く本音感のある文体。ハッシュタグなし。300〜500文字以内。",
+  "line": "LINE公式の投稿文。友だちに話しかける感覚。親しみやすく読みやすい改行。来店・行動促進を自然に含める。300〜500文字程度。"
 }`;
 }
+
+// ==================== 生成 ====================
 
 async function generate() {
   const btn = document.getElementById('generateBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="btn-icon">⏳</span>生成中...';
+  btn.innerHTML = '<span>⏳</span> 生成中...';
 
-  const inputs = collectInputs();
-  const prompt = buildPrompt(currentCat, inputs);
+  const mainContent = document.getElementById('mainContent')?.value || '';
+  const extra = document.getElementById('extraNote').value;
+  const inputs = [mainContent, extra].filter(Boolean).join('\n');
+  const prompt = buildPrompt(inputs);
 
   ['Ig','Th','Ln'].forEach(id => {
     document.getElementById('body'+id).innerHTML = `
@@ -642,7 +914,7 @@ async function generate() {
   }
 
   btn.disabled = false;
-  btn.innerHTML = '<span class="btn-icon">✨</span>3媒体まとめて生成';
+  btn.innerHTML = '<span>✨</span> 3媒体まとめて生成';
 }
 
 function renderOutput(id, text) {
@@ -664,30 +936,93 @@ async function copyText(key) {
   const text = generatedTexts[key];
   if (!text) return;
   await navigator.clipboard.writeText(text);
-
   const btnId = 'copy' + key.charAt(0).toUpperCase() + key.slice(1);
   const btn = document.getElementById(btnId);
-  btn.textContent = '✓ コピーしました';
+  btn.textContent = '✓ コピー済み';
   btn.classList.add('copied');
-  setTimeout(() => {
-    btn.textContent = 'コピー';
-    btn.classList.remove('copied');
-  }, 2000);
+  setTimeout(() => { btn.textContent = 'コピー'; btn.classList.remove('copied'); }, 2000);
 }
 
-// イベント登録（addEventListener）
-document.querySelectorAll('.cat-btn').forEach(btn => {
-  btn.addEventListener('click', () => selectCat(btn));
+// ==================== イベント登録 ====================
+
+document.getElementById('openSettings').addEventListener('click', openModal);
+document.getElementById('closeModal').addEventListener('click', closeModal);
+document.getElementById('modalOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
 });
-
+document.getElementById('saveSettings').addEventListener('click', saveSettings);
+document.getElementById('addCatBtn').addEventListener('click', () => {
+  if (config.categories.length >= 6) return;
+  config.categories.push('新しいカテゴリ');
+  renderCategoryList();
+});
+document.getElementById('urlCopyBtn').addEventListener('click', async () => {
+  const url = document.getElementById('urlText').textContent;
+  await navigator.clipboard.writeText(url);
+  const msg = document.getElementById('successMsg');
+  msg.style.display = 'block';
+  setTimeout(() => { msg.style.display = 'none'; }, 2000);
+});
 document.getElementById('generateBtn').addEventListener('click', generate);
-
 document.getElementById('copyIg').addEventListener('click', () => copyText('ig'));
 document.getElementById('copyTh').addEventListener('click', () => copyText('th'));
 document.getElementById('copyLn').addEventListener('click', () => copyText('ln'));
 
-// 初期フィールド描画
+// ==================== パスワード認証 ====================
+
+async function checkAuth() {
+  // sessionStorageに認証済みフラグがあればスキップ
+  if (sessionStorage.getItem('authed') === '1') return;
+
+  // 認証画面を表示
+  const screen = document.getElementById('authScreen');
+  screen.style.display = 'flex';
+
+  const input = document.getElementById('authInput');
+  const btn = document.getElementById('authBtn');
+  const err = document.getElementById('authError');
+
+  async function tryAuth() {
+    const pw = input.value;
+    if (!pw) return;
+    btn.disabled = true;
+    btn.textContent = '確認中...';
+    err.style.display = 'none';
+
+    try {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        sessionStorage.setItem('authed', '1');
+        screen.style.display = 'none';
+      } else {
+        err.style.display = 'block';
+        input.value = '';
+        input.focus();
+      }
+    } catch(e) {
+      err.textContent = 'エラーが発生しました。再度お試しください。';
+      err.style.display = 'block';
+    }
+
+    btn.disabled = false;
+    btn.textContent = '入力する';
+  }
+
+  btn.addEventListener('click', tryAuth);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') tryAuth(); });
+}
+
+// ==================== 初期化 ====================
+loadFromURL();
+renderHeader();
+renderCatGrid();
 renderFields();
+checkAuth();
 </script>
 </body>
 </html>
