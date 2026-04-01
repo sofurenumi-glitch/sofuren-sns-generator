@@ -999,13 +999,17 @@ async function checkAuth() {
       if (data.ok) {
         sessionStorage.setItem('authed', '1');
         screen.style.display = 'none';
+      } else if (data.error) {
+        err.textContent = 'サーバー設定エラー: ' + data.error;
+        err.style.display = 'block';
       } else {
+        err.textContent = 'パスワードが違います';
         err.style.display = 'block';
         input.value = '';
         input.focus();
       }
     } catch(e) {
-      err.textContent = 'エラーが発生しました。再度お試しください。';
+      err.textContent = '通信エラー: ' + (e.message || '再度お試しください');
       err.style.display = 'block';
     }
 
