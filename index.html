@@ -888,12 +888,19 @@ async function generate() {
     });
 
     const data = await res.json();
+    if (data.error) {
+      throw new Error(data.error.message || data.error);
+    }
     const raw = data.content?.map(c => c.text || '').join('');
+    if (!raw) {
+      throw new Error('AIからの応答が空でした。もう一度お試しください。');
+    }
 
     let parsed;
     try {
       const cleaned = raw.replace(/```json|```/g, '').trim();
-      parsed = JSON.parse(cleaned);
+      const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+      parsed = JSON.parse(jsonMatch ? jsonMatch[0] : cleaned);
     } catch(e) {
       throw new Error('JSONの解析に失敗しました。もう一度お試しください。');
     }
